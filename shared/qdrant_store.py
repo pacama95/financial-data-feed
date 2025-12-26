@@ -70,6 +70,33 @@ class QdrantStore:
 
         logger.info("✅ Connected to Qdrant at %s:%s", host, port)
 
+    def _ensure_payload_indexes(self, collection_name: str) -> None:
+        """Ensure required payload indexes exist on the collection."""
+        from qdrant_client.models import PayloadSchemaType
+        
+        required_indexes = {
+            "published_date": PayloadSchemaType.DATETIME,
+            "tickers": PayloadSchemaType.KEYWORD,
+            "source_name": PayloadSchemaType.KEYWORD,
+        }
+        
+        # Get existing collection info
+        collection_info = self.client.get_collection(collection_name)
+        existing_indexes = collection_info.payload_schema or {}
+        
+        # Create missing indexes
+        for field_name, field_schema in required_indexes.items():
+            if field_name not in existing_indexes:
+                try:
+                    self.client.create_payload_index(
+                        collection_name=collection_name,
+                        field_name=field_name,
+                        field_schema=field_schema,
+                    )
+                    logger.info(f"✅ Created payload index for '{field_name}' in collection '{collection_name}'")
+                except Exception as e:
+                    logger.warning(f"⚠️  Failed to create index for '{field_name}': {e}")
+
     def create_collection(self, collection_name: str, vector_size: int, recreate_if_exists: bool = False) -> None:
         collections = self.client.get_collections().collections
         collection_names = [c.name for c in collections]
@@ -119,6 +146,8 @@ class QdrantStore:
                         "Set recreate_on_dimension_mismatch=True or delete it manually."
                     )
             else:
+                # Check if required payload indexes exist
+                self._ensure_payload_indexes(collection_name)
                 logger.info(
                     "Collection '%s' already exists with correct configuration (dense: %s dims, sparse: enabled)",
                     collection_name,
