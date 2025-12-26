@@ -263,7 +263,9 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Run Financial News RAG MCP server with SSE")
     parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
-    parser.add_argument("--port", type=int, default=8000, help="Port to bind to")
+    parser.add_argument("--port", type=int, default=None, help="Port to bind to")
     args = parser.parse_args()
     
-    run_sse_server(host=args.host, port=args.port)
+    port = args.port if args.port is not None else int(os.getenv("PORT", "8000"))
+    
+    run_sse_server(host=args.host, port=port)
