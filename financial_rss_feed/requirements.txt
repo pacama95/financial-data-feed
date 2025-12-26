@@ -1,0 +1,23 @@
+# Core dependencies
+feedparser==6.0.10
+requests==2.31.0
+python-dateutil==2.8.2
+
+# Embedding generation
+sentence-transformers==2.2.2
+torch>=2.0.0
+
+# Vector databases (install one or more)
+qdrant-client==1.7.0
+# pinecone-client==2.2.4  # Uncomment if using Pinecone
+
+# For web scraping (optional, for custom feeds)
+beautifulsoup4==4.12.2
+lxml==4.9.3
+# playwright==1.40.0  # Uncomment for JavaScript-heavy sites
+
+# Optional: Better HTML cleaning
+html2text==2020.1.16
+
+# Utilities
+python-dotenv==1.0.0
