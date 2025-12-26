@@ -188,11 +188,21 @@ class EmbeddingGenerator:
             return
         try:
             from sentence_transformers import SentenceTransformer
+            import torch
         except ImportError as exc:
             raise ImportError("sentence-transformers not installed. Run: pip install sentence-transformers") from exc
 
         logger.info("Loading embedding model: %s on device: %s", self.model_name, self.device)
-        self.model = SentenceTransformer(self.model_name, device=self.device)
+        
+        # Disable meta device to avoid meta tensor errors
+        with torch.device('cpu'):
+            self.model = SentenceTransformer(self.model_name)
+        
+        # Move to target device after initialization
+        if self.device != 'cpu':
+            self.model = self.model.to(self.device)
+        else:
+            self.model = self.model.to('cpu')
 
     def generate_embedding(self, text: str) -> List[float]:
         """Generate embedding for a single text."""
