@@ -67,6 +67,7 @@ class PipelineRunner:
             company_names=config.get("company_names"),
             cleanup_days=config.get("cleanup_days", 30),
             max_age_hours=24,  # Default to 24 hours
+            recreate_collection=config.get("recreate_collection", False)
         )
         
         self.job_manager.update_progress(
@@ -102,6 +103,7 @@ class PipelineRunner:
             cleanup_days=config.get("cleanup_days", 30),
             days_back=7,  # Default to 7 days
             max_articles_per_ticker=10,
+            recreate_collection=config.get("recreate_collection", False)
         )
         
         self.job_manager.update_progress(

@@ -485,12 +485,18 @@ class RSSFetcher:
         try:
             logger.info(f"Fetching {source_name} ({feed_type.value}) from {region.value}...")
             
-            # Parse feed
-            feed = feedparser.parse(feed_url)
+            # Parse feed with sanitization
+            feed = feedparser.parse(feed_url, sanitize_html=True)
             
             # Check for parsing errors
             if feed.bozo:
-                logger.warning(f"  ⚠️  {source_name} has parsing issues: {feed.bozo_exception}")
+                error_type = type(feed.bozo_exception).__name__
+                logger.warning(f"  ⚠️  {source_name} has parsing issues ({error_type})")
+                
+                # If no entries were parsed, skip this feed
+                if not feed.entries:
+                    logger.error(f"  ❌ {source_name} returned no entries, skipping")
+                    return articles
             
             # Process each entry
             for entry in feed.entries:

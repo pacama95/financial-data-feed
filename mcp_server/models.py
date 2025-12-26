@@ -27,6 +27,10 @@ class RSSPipelineRequest(BaseModel):
         ge=1,
         le=365
     )
+    recreate_collection: bool = Field(
+        default=False,
+        description="Recreate the collection if it exists (useful for schema updates)"
+    )
     
     @validator('regions')
     def validate_regions(cls, v):
@@ -66,6 +70,10 @@ class APIPipelineRequest(BaseModel):
         description="Number of days to keep old articles",
         ge=1,
         le=365
+    )
+    recreate_collection: bool = Field(
+        default=False,
+        description="Recreate the collection if it exists (useful for schema updates)"
     )
     
     @validator('tickers')

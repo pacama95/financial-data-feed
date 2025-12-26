@@ -126,7 +126,7 @@ class QdrantStore:
                 )
                 return
 
-        from qdrant_client.models import SparseVectorParams
+        from qdrant_client.models import SparseVectorParams, PayloadSchemaType
 
         self.client.create_collection(
             collection_name=collection_name,
@@ -137,8 +137,26 @@ class QdrantStore:
                 "sparse": SparseVectorParams(),
             },
         )
+        
+        # Create payload indexes for filtering
+        self.client.create_payload_index(
+            collection_name=collection_name,
+            field_name="published_date",
+            field_schema=PayloadSchemaType.DATETIME,
+        )
+        self.client.create_payload_index(
+            collection_name=collection_name,
+            field_name="tickers",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+        self.client.create_payload_index(
+            collection_name=collection_name,
+            field_name="source_name",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+        
         logger.info(
-            "Created collection '%s' (dense vector size: %s, sparse vectors: enabled)",
+            "Created collection '%s' (dense vector size: %s, sparse vectors: enabled, payload indexes: published_date, tickers, source_name)",
             collection_name,
             vector_size,
         )
